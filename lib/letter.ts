@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import { Directory, File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { ApiError, ess } from './api';
 
@@ -22,10 +22,10 @@ export async function downloadVerificationLetter(): Promise<string> {
     reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
     reader.readAsDataURL(blob);
   });
-  const dir = FileSystem.documentDirectory + 'letters/';
-  await FileSystem.makeDirectoryAsync(dir, { intermediates: true }).catch(() => {});
-  const uri = dir + filename;
-  await FileSystem.writeAsStringAsync(uri, base64, { encoding: FileSystem.EncodingType.Base64 });
-  if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: 'Employment verification letter', UTI: 'com.adobe.pdf' });
-  return uri;
+  const dir = new Directory(Paths.document, 'letters');
+  if (!dir.exists) dir.create({ intermediates: true });
+  const file = new File(dir, filename);
+  file.write(base64, { encoding: 'base64' });
+  if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(file.uri, { mimeType: 'application/pdf', dialogTitle: 'Employment verification letter', UTI: 'com.adobe.pdf' });
+  return file.uri;
 }

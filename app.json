@@ -37,13 +37,18 @@
       "expo-font",
       [
         "expo-splash-screen",
-        { "image": "./assets/splash.png", "resizeMode": "cover", "backgroundColor": "#0A0C10" }
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "cover",
+          "backgroundColor": "#0A0C10"
+        }
       ]
     ],
-    "experiments": { "typedRoutes": true },
     "extra": {
       "apiBaseUrl": "https://nexora-hrms.up.railway.app",
-      "eas": { "projectId": "REPLACE_WITH_EAS_PROJECT_ID" }
+      "eas": {
+        "projectId": "REPLACE_WITH_EAS_PROJECT_ID"
+      }
     }
   }
 }

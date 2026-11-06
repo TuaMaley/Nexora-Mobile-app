@@ -43,10 +43,10 @@ export class ApiError extends Error {
   constructor(message: string, public status: number) { super(message); this.name = 'ApiError'; }
 }
 
-let onUnauthorized: (() => void) | null = null;
-export const setUnauthorizedHandler = (fn: (() => void) | null) => { onUnauthorized = fn; };
+export const setUnauthorizedHandlerRef: { current: (() => void) | null } = { current: null };
+export const setUnauthorizedHandler = (fn: (() => void) | null) => { setUnauthorizedHandlerRef.current = fn; };
 
-async function authHeaders(): Promise<Record<string, string>> {
+export async function authHeaders(): Promise<Record<string, string>> {
   const [token, company] = await Promise.all([session.get(), session.getCompany()]);
   const h: Record<string, string> = { Accept: 'application/json' };
   if (token) h.Authorization = `Bearer ${token}`;
@@ -59,7 +59,7 @@ export async function apiFetch(path: string, init: RequestInit = {}): Promise<Re
   let res: Response;
   try { res = await fetch(`${BASE_URL}${path}`, { ...init, headers }); }
   catch { throw new ApiError('No connection. Check your internet and try again.', 0); }
-  if (res.status === 401) { await session.clear(); onUnauthorized?.(); throw new ApiError('Your session has expired. Please sign in again.', 401); }
+  if (res.status === 401) { await session.clear(); setUnauthorizedHandlerRef.current?.(); throw new ApiError('Your session has expired. Please sign in again.', 401); }
   return res;
 }
 
@@ -99,6 +99,4 @@ export const ess = {
   training: () => api<{ enrollments: TrainingRow[] }>('/api/self-service/training'),
   requests: () => api<{ requests: RequestRow[] }>('/api/self-service/requests'),
   submitRequest: (b: { category: string; subject: string; details: string }) => api<{ request: { id: string; status: string } }>('/api/self-service/requests', json(b)),
-  /** Returns the PDF bytes of the employment verification letter. */
-  verificationLetter: () => apiFetch('/api/self-service/employment-verification', { method: 'POST' }),
 };

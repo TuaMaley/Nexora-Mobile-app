@@ -49,6 +49,18 @@
       "eas": {
         "projectId": "REPLACE_WITH_EAS_PROJECT_ID"
       }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png",
+      "name": "Nexora Employee",
+      "shortName": "Nexora",
+      "themeColor": "#E3141B",
+      "backgroundColor": "#0A0C10",
+      "display": "standalone",
+      "orientation": "portrait",
+      "description": "Nexora HRMS employee self-service: leave, payslips, letters and requests."
     }
   }
 }
